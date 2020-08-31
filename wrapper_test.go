@@ -2,11 +2,21 @@ package xio_test
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"fmt"
 	"io"
 	"testing"
 
 	"github.com/ulikunitz/xio"
 )
+
+func Example() {
+	h := sha256.New()
+	w := xio.WrapWriter(h)
+	w.WriteString("Hello, world!")
+	fmt.Printf("hash value %x\n", h.Sum(nil))
+	// Output: hash value 315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3
+}
 
 type tWriter interface {
 	io.Writer

@@ -1,3 +1,11 @@
+// Package xio extends a Writer to support WriteByte and WriteString.
+//
+// Sometimes you might get a Writer for which you need a WriteByte or
+// WriteString method. The WrapWriter function returns a full writer
+// supporting both methods. Alternatively you could use bufio.Writer,
+// which rquires however to call the Flush method. The writer returned
+// from WrapWriter executes all Write commands directly and doesn't
+// require a Flush method.
 package xio
 
 import (
@@ -5,7 +13,7 @@ import (
 	"io"
 )
 
-// A full writer supports the Write, WriteByte and WriteString method.
+// A full writer supports the Write, WriteByte and WriteString methods.
 type FullWriter interface {
 	io.Writer
 	io.StringWriter
@@ -21,8 +29,8 @@ type wrapper struct {
 	stringBuf []byte
 }
 
-// WrapWriter wraps the writer and returns a full writer supporting
-// Write, WriteByte and WriteString.
+// WrapWriter converts a writer into a writer that supports Write,
+// WriteByte and WriteString.
 func WrapWriter(w io.Writer) FullWriter {
 	if fw, ok := w.(FullWriter); ok {
 		return fw
