@@ -11,3 +11,6 @@ w := xio.WrapWriter(h)
 w.WriteString("Hello, world!")
 fmt.Printf("hash value %x\n", h.Sum(nil))
 ```
+
+The package has been developed in response to
+[Go issue](https://github.com/golang/go/issues/38776).
