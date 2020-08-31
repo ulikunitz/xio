@@ -96,7 +96,7 @@ type stringWriter struct {
 }
 
 func (w *stringWriter) WriteString(s string) (n int, err error) {
-	w.buf = append(w.buf, []byte(s)...)
+	w.buf = append(w.buf, s...)
 	return len(s), nil
 }
 
