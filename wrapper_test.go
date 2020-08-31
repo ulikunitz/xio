@@ -72,6 +72,24 @@ func (w *pureWriter) String() string {
 	return string(w.buf)
 }
 
+type byteWriter struct {
+	pureWriter
+}
+
+func (w *byteWriter) WriteByre(c byte) error {
+	w.buf = append(w.buf, c)
+	return nil
+}
+
+type stringWriter struct {
+	pureWriter
+}
+
+func (w *stringWriter) WriteString(s string) (n int, err error) {
+	w.buf = append(w.buf, []byte(s)...)
+	return len(s), nil
+}
+
 func TestWrapper(t *testing.T) {
 	tests := []struct {
 		s string
@@ -79,6 +97,7 @@ func TestWrapper(t *testing.T) {
 	}{
 		{"bytes.Buffer", new(bytes.Buffer)},
 		{"pureWriter", new(pureWriter)},
+		{"byteWriter", new(byteWriter)},
 	}
 	for _, tc := range tests {
 		t.Run(tc.s, func(t *testing.T) {
