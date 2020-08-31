@@ -12,5 +12,5 @@ w.WriteString("Hello, world!")
 fmt.Printf("hash value %x\n", h.Sum(nil))
 ```
 
-The package has been developed in response to
-[Go issue 38776](https://github.com/golang/go/issues/38776).
+The package has been developed in response to Go issue
+[38776](https://github.com/golang/go/issues/38776).
