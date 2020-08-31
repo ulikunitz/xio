@@ -2,39 +2,87 @@ package xio_test
 
 import (
 	"bytes"
+	"io"
 	"testing"
 
 	"github.com/ulikunitz/xio"
 )
 
 type tWriter interface {
-	xio.FullWriter
+	io.Writer
 	String() string
 }
 
 func testWrapper(t *testing.T, w tWriter) {
-	a := []byte("123")
-	n, err := w.Write(a)
-	if err != nil {
-		t.Fatalf("Write error %s", err)
+	const s = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	fw := xio.WrapWriter(w)
+
+	i := 0
+	for ; i < 3; i++ {
+		if err := fw.WriteByte(s[i]); err != nil {
+			t.Fatalf("w.WriteByte(s[%d]) error %s", i, err)
+		}
 	}
-	if n != 3 {
-		t.Fatalf("Write returned %d; want %d", n, 3)
+	for ; i <= 15; i += 3 {
+		a := []byte(s[i : i+3])
+		n, err := fw.Write(a)
+		if err != nil {
+			t.Fatalf("w.Write([]byte(s[%d:%d]) error %s",
+				i, i+3, err)
+		}
+		if n != 3 {
+			t.Fatalf("w.Write([]byte(s[%d:%d])"+
+				" returned %d; want %d", i, i+3, n, 3)
+		}
+	}
+	for ; i < len(s); i += 3 {
+		j := i + 3
+		if j > len(s) {
+			j = len(s)
+		}
+		tmp := s[i:j]
+		n, err := fw.WriteString(tmp)
+		if err != nil {
+			t.Fatalf("w.WriteString(s[%d:%d]) error %s",
+				i, j, err)
+		}
+		if n != len(tmp) {
+			t.Fatalf("w.WriteString(s[%d:%d]) returned %d; want %d",
+				i, j, n, len(tmp))
+		}
+	}
+
+	g := w.String()
+	if g != s {
+		t.Fatalf("w didn't return the expected string")
 	}
 }
 
+type pureWriter struct {
+	buf []byte
+}
+
+func (w *pureWriter) Write(p []byte) (n int, err error) {
+	w.buf = append(w.buf, p...)
+	return len(p), nil
+}
+
+func (w *pureWriter) String() string {
+	return string(w.buf)
+}
+
 func TestWrapper(t *testing.T) {
-	buf := new(bytes.Buffer)
-	w := xio.WrapWriter(buf)
-
-	const s = "foobar"
-
-	_, err := w.WriteString(s)
-	if err != nil {
-		t.Fatalf("WriteString error %s", err)
+	tests := []struct {
+		s string
+		w tWriter
+	}{
+		{"bytes.Buffer", new(bytes.Buffer)},
+		{"pureWriter", new(pureWriter)},
 	}
-
-	if g := buf.String(); g != s {
-		t.Fatalf("buf returns string %q; want %q", g, s)
+	for _, tc := range tests {
+		t.Run(tc.s, func(t *testing.T) {
+			testWrapper(t, tc.w)
+		})
 	}
 }
