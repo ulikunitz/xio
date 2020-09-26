@@ -3,7 +3,7 @@
 // Sometimes you might get a Writer for which you need a WriteByte or
 // WriteString method. The WrapWriter function returns a full writer
 // supporting both methods. Alternatively you could use bufio.Writer,
-// which rquires however to call the Flush method. The writer returned
+// which requires however to call the Flush method. The writer returned
 // from WrapWriter executes all Write commands directly and doesn't
 // require a Flush method.
 package xio
